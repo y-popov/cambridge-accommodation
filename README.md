@@ -1,0 +1,1 @@
+![status](https://github.com/y-popov/cambridge-accommodation/actions/workflows/deploy.yml/badge.svg)
