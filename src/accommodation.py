@@ -97,8 +97,8 @@ class AccommodationApi:
             label = f'{prop_type} {rent_price} from {prop_available}'
 
             flat = {
-                'prop_id': el['id'],
-                'prop_url': f'{self.base_url}{prop_uri}',
+                'id': el['id'],
+                'url': f'{self.base_url}{prop_uri}',
                 'price': int(rent_price[1:]),
                 'label': label
             }

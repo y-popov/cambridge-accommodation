@@ -5,6 +5,7 @@ import logging
 from src.s3_tools import load_flats, write_flats, check_s3
 from src.accommodation import AccommodationApi
 from src.telegram import send_tg_message
+from src.zoopla import ZooplaApi
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -21,16 +22,21 @@ s3 = boto3.client(
 def main():
     check_s3(s3=s3)
 
-    accmd = AccommodationApi()
-    accmd.login(login=os.getenv('ACCOMMODATION_LOGIN'), password=os.getenv('ACCOMMODATION_PASSWORD'))
+    apis = {
+        'accommodation': AccommodationApi(),
+        'zoopla': ZooplaApi()
+    }
+
+    apis['accommodation'].login(login=os.getenv('ACCOMMODATION_LOGIN'), password=os.getenv('ACCOMMODATION_PASSWORD'))
 
     old_flats = load_flats(s3=s3)
 
-    for flat in accmd.get_flats():
-        if flat['prop_id'] not in old_flats:
-            message = f'{flat["label"]} [View]({flat["prop_url"]})'
-            send_tg_message(message)
-            old_flats.append(flat['prop_id'])
+    for api_key in apis:
+        for flat in apis[api_key].get_flats():
+            if flat['id'] not in old_flats[api_key]:
+                message = f'{flat["label"]} [View]({flat["url"]})'
+                send_tg_message(message)
+                old_flats[api_key].append(flat['id'])
 
     write_flats(s3=s3, flats=old_flats)
 
