@@ -15,8 +15,6 @@ class AccommodationApi:
     def send_post(self, url: str, data: Dict = None) -> requests.Response:
         r = self.session.post(url, data=data)
         self.soup = BeautifulSoup(r.text, "html.parser")
-        with open('site.html', 'wb') as f:
-            f.write(r.content)
         return r
 
     def get_viewstate(self) -> Dict[str, str]:
