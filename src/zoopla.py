@@ -9,14 +9,15 @@ class ZooplaApi:
         furnished_states = ('furnished', 'part_furnished')
         for furnished_state in furnished_states:
             r = requests.get(
-                url=f'{self.base_url}/to-rent/property/cambridgeshire/cambridge/',
+                url=f'{self.base_url}/to-rent/property/cambridge-city-centre/',
                 params={
                     'price_frequency': 'per_month',
                     'beds_min': 1,
                     'price_max': 1500,
                     'available_from': '1months',
                     'include_shared_accommodation': False,
-                    'furnished_state': furnished_state
+                    'furnished_state': furnished_state,
+                    'radius': 1
                 }
             )
             s = BeautifulSoup(r.text, 'html.parser')
