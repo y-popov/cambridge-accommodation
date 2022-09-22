@@ -36,7 +36,7 @@ class ZooplaApi:
                     'available': date_block.get_text().lstrip(),
                     'property': property_block.get_text(),
                 }
-                flat['label'] = f'{flat["property"]} {flat["price"]} from {flat["available"]}'
+                flat['label'] = f'{flat["property"]} for {flat["price"]} available from {flat["available"]}'
 
                 yield flat
 
