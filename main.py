@@ -1,26 +1,22 @@
 import os
-import boto3
+import flask
 import logging
+import functions_framework
 
 from src.s3_tools import load_flats, write_flats, check_s3
 from src.accommodation import AccommodationApi
 from src.telegram import send_tg_message
 from src.zoopla import ZooplaApi
+from google.cloud import storage
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-s3 = boto3.client(
-    's3',
-    aws_access_key_id=os.getenv('AWS_KEY_ID'),
-    aws_secret_access_key=os.getenv('AWS_SECRET_KEY'),
-    endpoint_url='https://storage.yandexcloud.net',
-    region_name='ru-central1'
-)
+gs = storage.Client()
 
 
 def main():
-    check_s3(s3=s3)
+    bucket = check_s3(gs=gs)
 
     apis = {
         'accommodation': AccommodationApi(),
@@ -29,7 +25,7 @@ def main():
 
     apis['accommodation'].login(login=os.getenv('ACCOMMODATION_LOGIN'), password=os.getenv('ACCOMMODATION_PASSWORD'))
 
-    old_flats = load_flats(s3=s3)
+    old_flats = load_flats(gs=bucket)
 
     for api_key in apis:
         for flat in apis[api_key].get_flats():
@@ -38,11 +34,13 @@ def main():
                 send_tg_message(message)
                 old_flats[api_key].append(flat['id'])
 
-    write_flats(s3=s3, flats=old_flats)
+    write_flats(gs=bucket, flats=old_flats)
 
 
-def handler(event, context):
+@functions_framework.http
+def handler(request: flask.Request):
     main()
+    return 'ok'
 
 
 if __name__ == '__main__':
