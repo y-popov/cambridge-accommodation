@@ -18,7 +18,7 @@ class RightmoveApi:
         )
 
         if resp.status_code != 200:
-            raise requests.HTTPError(r.text)
+            raise requests.HTTPError(resp.text)
 
         soup = BeautifulSoup(resp.text, 'html.parser')
 
@@ -34,7 +34,7 @@ class RightmoveApi:
                 continue
 
             r = requests.get(f"{self.base_url}{link}")
-            s = BeautifulSoup(r.text)
+            s = BeautifulSoup(r.text, 'html.parser')
             date_block = s.find("dt", text='Let available date: ')
             date = date_block.nextSibling.get_text()
 

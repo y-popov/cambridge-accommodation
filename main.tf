@@ -25,7 +25,7 @@ data "google_cloudfunctions_function" "scrapper" {
 
 resource "google_cloud_scheduler_job" "timer" {
   name             = "accommodation-invoker"
-  description      = "Triggers accommodation scrapper once an hour"
+  description      = "Triggers accommodation scrapper twice an hour"
   schedule         = "*/30 * * * *"
   attempt_deadline = format("%ds", data.google_cloudfunctions_function.scrapper.timeout)
 
