@@ -1,4 +1,3 @@
-boto3
-botocore
 requests
 beautifulsoup4
+google-cloud-storage
