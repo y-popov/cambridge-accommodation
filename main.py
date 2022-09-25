@@ -1,5 +1,7 @@
 import os
+import flask
 import logging
+import functions_framework
 
 from src.s3_tools import load_flats, write_flats, check_s3
 from src.accommodation import AccommodationApi
@@ -35,8 +37,10 @@ def main():
     write_flats(gs=bucket, flats=old_flats)
 
 
-def handler(event, context):
+@functions_framework.http
+def handler(request: flask.Request):
     main()
+    return 'ok'
 
 
 if __name__ == '__main__':

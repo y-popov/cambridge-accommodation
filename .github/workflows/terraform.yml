@@ -8,21 +8,18 @@ on:
     paths:
       - 'main.tf'
 
-env:
-  GOOGLE_APPLICATION_CREDENTIALS: "key.json"
 
 jobs:
   terraform:
     name: 'Terraform'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Dump Credentials
-        shell: bash
-        env:
-          GOOGLE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
-        run: |
-          echo "$GOOGLE_SERVICE_ACCOUNT" > "$GOOGLE_APPLICATION_CREDENTIALS"
+      - uses: actions/checkout@v3
+      - id: auth
+        name: Authentication
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
       - uses: hashicorp/setup-terraform@v1
         with:
           terraform_wrapper: true
