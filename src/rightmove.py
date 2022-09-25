@@ -30,6 +30,9 @@ class RightmoveApi:
             title = title_block.get_text().strip()
             price = price_block.get_text()
 
+            if link == '':
+                continue
+
             r = requests.get(f"{self.base_url}{link}")
             s = BeautifulSoup(r.text)
             date_block = s.find("dt", text='Let available date: ')
