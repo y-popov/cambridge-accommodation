@@ -9,12 +9,7 @@ on:
       - 'main.tf'
 
 env:
-  YC_TOKEN: ${{ secrets.OAUTH_TOKEN }}
-  YC_CLOUD_ID: ${{ secrets.YC_CLOUD_ID }}
-  YC_FOLDER_ID: ${{ secrets.YC_FOLDER_ID }}
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  TF_VAR_BUCKET: ${{ secrets.BUCKET }}
+  GOOGLE_APPLICATION_CREDENTIALS: "key.json"
 
 jobs:
   terraform:
@@ -22,6 +17,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Dump Credentials
+        shell: bash
+        env:
+          GOOGLE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
+        run: |
+          echo "$GOOGLE_SERVICE_ACCOUNT" > "$GOOGLE_APPLICATION_CREDENTIALS"
       - uses: hashicorp/setup-terraform@v1
         with:
           terraform_wrapper: true
