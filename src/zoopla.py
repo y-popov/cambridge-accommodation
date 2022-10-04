@@ -1,11 +1,13 @@
 import requests
+from typing import Iterable
 from bs4 import BeautifulSoup
+from src.api import BaseApi, Flat
 
 
-class ZooplaApi:
+class ZooplaApi(BaseApi):
     base_url = 'https://www.zoopla.co.uk'
 
-    def get_flats(self):
+    def get_flats(self) -> Iterable[Flat]:
         furnished_states = ('furnished', 'part_furnished')
         for furnished_state in furnished_states:
             r = requests.get(
@@ -29,14 +31,13 @@ class ZooplaApi:
                 property_block = res.find("h2", attrs={'data-testid': "listing-title"})
                 link = link_block["href"].split('?')[0]
 
-                flat = {
-                    'id': int(link.split('/')[-2]),
-                    'url': f'{self.base_url}{link}',
-                    'price': price_block.findChild().get_text(),
-                    'available': date_block.get_text().lstrip(),
-                    'property': property_block.get_text(),
-                }
-                flat['label'] = f'{flat["property"]} for {flat["price"]} available from {flat["available"]}'
+                flat = Flat(
+                    id=int(link.split('/')[-2]),
+                    url=f'{self.base_url}{link}',
+                    price=price_block.findChild().get_text(),
+                    available=date_block.get_text().lstrip(),
+                    type=property_block.get_text()
+                )
 
                 yield flat
 

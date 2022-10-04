@@ -1,11 +1,21 @@
 import requests
+from typing import Iterable
 from bs4 import BeautifulSoup
+from src.api import BaseApi, Flat
 
 
-class RightmoveApi:
+class SmartFlat(Flat):
+    def get_date(self):
+        r = requests.get(self.url)
+        s = BeautifulSoup(r.text, 'html.parser')
+        date_block = s.find("dt", text='Let available date: ')
+        self.available = date_block.nextSibling.get_text()
+
+
+class RightmoveApi(BaseApi):
     base_url = 'https://www.rightmove.co.uk'
 
-    def get_flats(self):
+    def get_flats(self) -> Iterable[SmartFlat]:
         resp = requests.get(
             url=f'{self.base_url}/property-to-rent/find.html',
             params={
@@ -33,16 +43,12 @@ class RightmoveApi:
             if link == '':
                 continue
 
-            r = requests.get(f"{self.base_url}{link}")
-            s = BeautifulSoup(r.text, 'html.parser')
-            date_block = s.find("dt", text='Let available date: ')
-            date = date_block.nextSibling.get_text()
-
-            flat = {
-                'id': int(link.split('/')[-2]),
-                'url': f"{self.base_url}{link}",
-                'label': f"{title} for {price} available from {date}",
-                'price': price
-            }
+            flat = SmartFlat(
+                id=int(link.split('/')[-2]),
+                url=f"{self.base_url}{link}",
+                price=price,
+                available=None,
+                type=title
+            )
 
             yield flat

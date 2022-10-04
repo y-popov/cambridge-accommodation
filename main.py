@@ -34,10 +34,12 @@ def main():
             old_flats[api_key] = []
 
         for flat in api.get_flats():
-            if flat['id'] not in old_flats[api_key]:
-                message = f'{flat["label"]} [View]({flat["url"]})'
+            if flat.id not in old_flats[api_key]:
+                if flat.available is None:
+                    flat.get_date()
+                message = f'{flat.label} [View]({flat.url})'
                 send_tg_message(message)
-                old_flats[api_key].append(flat['id'])
+                old_flats[api_key].append(flat.id)
 
     write_flats(gs=bucket, flats=old_flats)
 
