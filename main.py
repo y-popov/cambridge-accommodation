@@ -33,10 +33,15 @@ def main():
         if api_key not in old_flats:
             old_flats[api_key] = []
 
+        c = 0
         for flat in api.get_flats():
             if flat.id not in old_flats[api_key]:
+                if c >= 5:
+                    logging.warning('More than 5 properties for one API. Aborting...')
+                    break
                 if flat.available is None:
                     flat.get_date()
+                c += 1
                 message = f'{flat.label} [View]({flat.url})'
                 send_tg_message(message)
                 old_flats[api_key].append(flat.id)
