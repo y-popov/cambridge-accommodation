@@ -16,7 +16,7 @@ def check_s3(gs: Client) -> Bucket:
     return gs.bucket(bucket)
 
 
-def load_flats(gs: Bucket) -> Dict[str, List[str]]:
+def load_flats(gs: Bucket) -> Dict[str, List[int]]:
     blob = gs.blob('accommodations.json')
     body = blob.download_as_string()
     flat_ids = json.loads(body)
@@ -24,7 +24,7 @@ def load_flats(gs: Bucket) -> Dict[str, List[str]]:
     return flat_ids
 
 
-def write_flats(gs: Bucket, flats: Dict[str, List[str]]):
+def write_flats(gs: Bucket, flats: Dict[str, List[int]]):
     body = json.dumps(flats)
     blob = gs.blob('accommodations.json')
     blob.upload_from_string(data=body)

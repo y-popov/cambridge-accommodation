@@ -1,11 +1,12 @@
 import logging
 import requests
-from typing import Dict
 from bs4 import BeautifulSoup
+from typing import Dict, Iterable
 from datetime import date, timedelta
+from src.api import BaseApi, Flat
 
 
-class AccommodationApi:
+class AccommodationApi(BaseApi):
     base_url = "https://www.accommodation.cam.ac.uk"
 
     def __init__(self):
@@ -71,7 +72,7 @@ class AccommodationApi:
             raise ValueError('Authorisation error occurred')
         logging.info(f'Successfully authenticated at {self.base_url}')
 
-    def get_flats(self) -> Dict:
+    def get_flats(self) -> Iterable[Flat]:
         search_url = f'{self.base_url}/Client/Adverts/Search.aspx'
         self.send_post(search_url)
 
@@ -94,13 +95,13 @@ class AccommodationApi:
             prop_type = el.find(class_='prop-type').get_text().strip()
             rent_price = el.find(class_='rent-price').get_text().strip()
             prop_available = el.find(class_="available-from").get_text().strip()
-            label = f'{prop_type} {rent_price} from {prop_available}'
 
-            flat = {
-                'id': el['id'],
-                'url': f'{self.base_url}{prop_uri}',
-                'price': int(rent_price[1:]),
-                'label': label
-            }
+            flat = Flat(
+                id=int(el['id']),
+                url=f'{self.base_url}{prop_uri}',
+                price=rent_price[1:],
+                available=prop_available,
+                type=prop_type
+            )
             logging.debug(f'Found {flat}')
             yield flat
