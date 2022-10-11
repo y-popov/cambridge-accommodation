@@ -15,7 +15,7 @@ class ZooplaApi(BaseApi):
                 params={
                     'price_frequency': 'per_month',
                     'beds_min': 1,
-                    'price_max': 1500,
+                    'price_max': 1400,
                     'available_from': '1months',
                     'include_shared_accommodation': False,
                     'furnished_state': furnished_state,

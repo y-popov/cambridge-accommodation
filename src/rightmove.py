@@ -22,7 +22,7 @@ class RightmoveApi(BaseApi):
                 url=f'{self.base_url}/property-to-rent/find.html',
                 params={
                     'minBedrooms': 1,
-                    'maxPrice': 1500,
+                    'maxPrice': 1400,
                     'dontShow': 'houseShare,student',
                     'furnishTypes': furnish_type,
                     'locationIdentifier': 'REGION^274'
