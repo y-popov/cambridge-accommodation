@@ -6,6 +6,7 @@ import functions_framework
 from src.s3_tools import load_flats, write_flats, check_s3
 from src.accommodation import AccommodationApi
 from src.telegram import send_tg_message
+from src.rightmove import RightmoveApi
 from src.zoopla import ZooplaApi
 from google.cloud import storage
 
@@ -20,6 +21,7 @@ def main():
 
     apis = {
         'accommodation': AccommodationApi(),
+        'rightmove': RightmoveApi(),
         'zoopla': ZooplaApi()
     }
 
@@ -27,12 +29,22 @@ def main():
 
     old_flats = load_flats(gs=bucket)
 
-    for api_key in apis:
-        for flat in apis[api_key].get_flats():
-            if flat['id'] not in old_flats[api_key]:
-                message = f'{flat["label"]} [View]({flat["url"]})'
+    for api_key, api in apis.items():
+        if api_key not in old_flats:
+            old_flats[api_key] = []
+
+        c = 0
+        for flat in api.get_flats():
+            if flat.id not in old_flats[api_key]:
+                if c >= 5:
+                    logging.warning('More than 5 properties for one API. Aborting...')
+                    break
+                if flat.available is None:
+                    flat.get_date()
+                c += 1
+                message = f'{flat.label} [View]({flat.url})'
                 send_tg_message(message)
-                old_flats[api_key].append(flat['id'])
+                old_flats[api_key].append(flat.id)
 
     write_flats(gs=bucket, flats=old_flats)
 
