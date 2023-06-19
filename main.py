@@ -21,7 +21,7 @@ def main():
     apis = {
         'accommodation': AccommodationApi(),
         'rightmove': RightmoveApi(),
-        'zoopla': ZooplaApi()
+        # 'zoopla': ZooplaApi()
     }
 
     apis['accommodation'].login(login=os.getenv('ACCOMMODATION_LOGIN'), password=os.getenv('ACCOMMODATION_PASSWORD'))
