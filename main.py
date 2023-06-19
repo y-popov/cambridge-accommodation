@@ -13,10 +13,9 @@ from google.cloud import storage
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-gs = storage.Client()
-
 
 def main():
+    gs = storage.Client()
     bucket = check_s3(gs=gs)
 
     apis = {

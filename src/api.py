@@ -1,4 +1,6 @@
-from typing import Iterable
+import json
+import os.path
+from typing import Iterable, Dict, Any
 from abc import abstractmethod
 from dataclasses import dataclass
 
@@ -20,12 +22,23 @@ class Flat:
 
 
 class BaseApi:
+    def __init__(self):
+        self.config = self.load_config()
 
     @property
     @abstractmethod
     def base_url(self) -> str:
         return 'https://www.example.co.uk'
 
+    @property
+    @abstractmethod
+    def config_filename(self) -> str:
+        return 'config.json'
+
     @abstractmethod
     def get_flats(self) -> Iterable[Flat]:
         pass
+
+    def load_config(self) -> Dict[str, Any]:
+        with open(os.path.join('assets', self.config_filename)) as f:
+            return json.load(f)
