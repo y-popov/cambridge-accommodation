@@ -33,6 +33,8 @@ jobs:
         id: plan
         if: github.event_name == 'pull_request'
         run: terraform plan -no-color
+        env:
+          TF_VAR_PROJECT: ${{ secrets.TF_VAR_PROJECT }}
         continue-on-error: true
       - name: Update Pull Request
         uses: actions/github-script@0.9.0
@@ -69,3 +71,5 @@ jobs:
       - name: Terraform Apply
         if: github.ref == 'refs/heads/master' && github.event_name == 'push'
         run: terraform apply -auto-approve
+        env:
+          TF_VAR_PROJECT: ${{ secrets.TF_VAR_PROJECT }}
