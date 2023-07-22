@@ -2,7 +2,7 @@
   "minBedrooms": 1,
   "maxPrice": 1200,
   "dontShow": "houseShare,student,retirement",
-  "locationIdentifier": "REGION^274",
-  "radius": 5,
+  "locationIdentifier": "REGION^21561",
+  "radius": 10,
   "furnish_types": ["partFurnished,furnished,unfurnished"]
 }
