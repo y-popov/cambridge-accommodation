@@ -4,5 +4,5 @@
   "dontShow": "houseShare,student,retirement",
   "locationIdentifier": "REGION^274",
   "radius": 5,
-  "furnish_types": ["partFurnished,furnished"]
+  "furnish_types": ["partFurnished,furnished,unfurnished"]
 }
