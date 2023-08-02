@@ -38,7 +38,9 @@ class ZooplaApi(BaseApi):
                     url=f'{self.base_url}{link}',
                     price=price_block.findChild().get_text(),
                     available=date_block.get_text().lstrip(),
-                    type=property_block.get_text()
+                    _type=property_block.get_text(),
+                    _furnished=None,
+                    title=None
                 )
 
                 yield flat

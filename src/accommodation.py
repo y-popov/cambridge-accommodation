@@ -103,7 +103,9 @@ class AccommodationApi(BaseApi):
                 url=f'{self.base_url}{prop_uri}',
                 price=rent_price[1:],
                 available=prop_available,
-                type=prop_type
+                _type=prop_type,
+                _furnished=None,
+                title=None
             )
             logging.debug(f'Found {flat}')
             yield flat

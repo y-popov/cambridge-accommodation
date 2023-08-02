@@ -11,14 +11,26 @@ class Flat:
     url: str
     price: str
     available: str
-    type: str
-    
+    _type: str
+    _furnished: str
+    title: str
+
     @property
     def label(self) -> str:
         return f'{self.type} for {self.price} available from {self.available}'
 
+    @property
+    def type(self):
+        if self._type is None:
+            self._type = f'{self.furnished} {self.title}'
+        return self._type
+
     def get_date(self):
         pass
+
+    @property
+    def furnished(self):
+        return self._furnished
 
 
 class BaseApi:

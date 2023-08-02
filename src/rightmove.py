@@ -9,12 +9,25 @@ user_agent = UserAgent()
 
 class SmartFlat(Flat):
     ua = user_agent
+    _data = None
+
+    @property
+    def data(self):
+        if self._data is None:
+            r = requests.get(self.url, headers={'User-Agent': self.ua.random})
+            self._data = BeautifulSoup(r.text, 'html.parser')
+        return self._data
 
     def get_date(self):
-        r = requests.get(self.url, headers={'User-Agent': self.ua.random})
-        s = BeautifulSoup(r.text, 'html.parser')
-        date_block = s.find("dt", text='Let available date: ')
+        date_block = self.data.find("dt", text='Let available date: ')
         self.available = date_block.nextSibling.get_text()
+
+    @property
+    def furnished(self):
+        if self._furnished is None:
+            block = self.data.find("dt", text='Furnish type: ')
+            self._furnished = block.nextSibling.get_text()
+        return self._furnished
 
 
 class RightmoveApi(BaseApi):
@@ -51,13 +64,14 @@ class RightmoveApi(BaseApi):
                 if link == '':
                     continue
 
-                furnish_label = 'Unfurnished' if furnish_type.startswith('un') else 'Furnished'
                 flat = SmartFlat(
                     id=int(link.split('/')[-2]),
                     url=f"{self.base_url}{link}",
                     price=price,
                     available=None,
-                    type=f'{furnish_label} {title}'
+                    _furnished=None,
+                    title=title,
+                    _type=None
                 )
 
                 yield flat
