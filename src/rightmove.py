@@ -1,12 +1,17 @@
 import requests
 from typing import Iterable
 from bs4 import BeautifulSoup
+from fake_useragent import UserAgent
 from src.api import BaseApi, Flat
+
+user_agent = UserAgent()
 
 
 class SmartFlat(Flat):
+    ua = user_agent
+
     def get_date(self):
-        r = requests.get(self.url)
+        r = requests.get(self.url, headers={'User-Agent': self.ua.random})
         s = BeautifulSoup(r.text, 'html.parser')
         date_block = s.find("dt", text='Let available date: ')
         self.available = date_block.nextSibling.get_text()
