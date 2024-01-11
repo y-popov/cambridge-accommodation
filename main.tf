@@ -1,5 +1,7 @@
-locals {
-  project = "madproject-201813"
+variable "PROJECT" {
+  type        = string
+  nullable    = false
+  description = "google cloud project name"
 }
 
 terraform {
@@ -15,7 +17,7 @@ terraform {
 }
 
 provider "google" {
-  project = local.project
+  project = var.PROJECT
   region  = "europe-west2"
 }
 
@@ -50,7 +52,7 @@ resource "google_service_account" "function_invoker" {
 }
 
 resource "google_project_iam_binding" "function_invoker_role" {
-  project = local.project
+  project = var.PROJECT
   role    = "roles/cloudfunctions.invoker"
 
   members = [

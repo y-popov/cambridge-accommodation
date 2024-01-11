@@ -1,0 +1,11 @@
+{
+    "price_frequency": "per_month",
+    "beds_min": 1,
+    "price_max": 1200,
+    "available_from": "6months",
+    "is_shared_accommodation": false,
+    "is_retirement_home": false,
+    "furnished_state": ["furnished", "part_furnished"],
+    "location": "cambridgeshire/cambridge",
+    "radius": 5
+}

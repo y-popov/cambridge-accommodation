@@ -1,31 +1,50 @@
 import requests
 from typing import Iterable
 from bs4 import BeautifulSoup
+from fake_useragent import UserAgent
 from src.api import BaseApi, Flat
+
+user_agent = UserAgent()
 
 
 class SmartFlat(Flat):
+    ua = user_agent
+    _data = None
+
+    @property
+    def data(self):
+        if self._data is None:
+            r = requests.get(self.url, headers={'User-Agent': self.ua.random})
+            self._data = BeautifulSoup(r.text, 'html.parser')
+        return self._data
+
     def get_date(self):
-        r = requests.get(self.url)
-        s = BeautifulSoup(r.text, 'html.parser')
-        date_block = s.find("dt", text='Let available date: ')
+        date_block = self.data.find("dt", text='Let available date: ')
         self.available = date_block.nextSibling.get_text()
+
+    @property
+    def furnished(self):
+        if self._furnished is None:
+            block = self.data.find("dt", text='Furnish type: ')
+            self._furnished = block.nextSibling.get_text()
+        return self._furnished
 
 
 class RightmoveApi(BaseApi):
     base_url = 'https://www.rightmove.co.uk'
+    config_filename = 'rightmove_query.json'
 
     def get_flats(self) -> Iterable[SmartFlat]:
-        furnish_types = ('partFurnished,furnished', 'unfurnished')
-        for furnish_type in furnish_types:
+        for furnish_type in self.config['furnish_types']:
             resp = requests.get(
                 url=f'{self.base_url}/property-to-rent/find.html',
                 params={
-                    'minBedrooms': 1,
-                    'maxPrice': 1400,
-                    'dontShow': 'houseShare,student',
+                    'minBedrooms': self.config['minBedrooms'],
+                    'maxPrice': self.config['maxPrice'],
+                    'dontShow': self.config['dontShow'],
                     'furnishTypes': furnish_type,
-                    'locationIdentifier': 'REGION^274'
+                    'locationIdentifier': self.config['locationIdentifier'],
+                    'radius': self.config['radius']
                 }
             )
 
@@ -45,13 +64,14 @@ class RightmoveApi(BaseApi):
                 if link == '':
                     continue
 
-                furnish_label = 'Unfurnished' if furnish_type.startswith('un') else 'Furnished'
                 flat = SmartFlat(
                     id=int(link.split('/')[-2]),
                     url=f"{self.base_url}{link}",
                     price=price,
                     available=None,
-                    type=f'{furnish_label} {title}'
+                    _furnished=None,
+                    title=title,
+                    _type=None
                 )
 
                 yield flat

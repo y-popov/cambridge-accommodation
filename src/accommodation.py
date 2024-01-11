@@ -8,10 +8,12 @@ from src.api import BaseApi, Flat
 
 class AccommodationApi(BaseApi):
     base_url = "https://www.accommodation.cam.ac.uk"
+    config_filename = 'accommodation_query.json'
 
     def __init__(self):
         self.session = requests.Session()
         self.soup = None
+        super().__init__()
 
     def send_post(self, url: str, data: Dict = None) -> requests.Response:
         r = self.session.post(url, data=data)
@@ -81,8 +83,8 @@ class AccommodationApi(BaseApi):
         buttons = self.get_form_buttons()
         search_button = {k: v for k, v in buttons.items() if k.endswith('btnSearch')}
 
-        search_date = date.today() + timedelta(weeks=4)
-        form['_ctl0:_ctl0:cpFull:cpFull:txt_start_date'] = search_date.strftime('%d %b %Y')
+        for key, value in self.config.items():
+            form[f'_ctl0:_ctl0:cpFull:cpFull:{key}'] = value
 
         self.send_post(search_url, data={**viewstate, **form, **search_button})
 
@@ -101,7 +103,9 @@ class AccommodationApi(BaseApi):
                 url=f'{self.base_url}{prop_uri}',
                 price=rent_price[1:],
                 available=prop_available,
-                type=prop_type
+                _type=prop_type,
+                _furnished=None,
+                title=None
             )
             logging.debug(f'Found {flat}')
             yield flat
